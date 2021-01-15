@@ -1,5 +1,7 @@
 package org.example.display;
 
+import org.example.utils.ImageHelper;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -8,6 +10,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 public class Display {
 
@@ -77,6 +80,34 @@ public class Display {
 
             theMainPanel.removeAll();
 
+            //Show the image tools helper
+            JPanel panel = new JPanel(new FlowLayout());
+            JButton grayScaleButton = new JButton("Gray Scale");
+            grayScaleButton.addActionListener(e -> {
+
+                SwingWorker<BufferedImage, Void> grayScaleImageWorker = new SwingWorker<>() {
+                    @Override
+                    protected BufferedImage doInBackground() throws Exception {
+                        return ImageHelper.grayScale(image.getSubimage(0, 0, image.getWidth(), image.getHeight()));
+                    }
+
+                    @Override
+                    protected void done() {
+                        try {
+                            showTheNewImage(get());
+                        } catch (InterruptedException | ExecutionException exception) {
+                            exception.printStackTrace();
+                        }
+                    }
+                };
+
+                grayScaleImageWorker.execute();
+
+            });
+
+            panel.add(grayScaleButton);
+
+            theMainPanel.add(panel, BorderLayout.NORTH);
             theMainPanel.add(new JLabel(new ImageIcon(image)), BorderLayout.CENTER);
 
             theMainPanel.updateUI();
@@ -89,6 +120,16 @@ public class Display {
     public void show() {
 
         frame.setVisible(true);
+
+    }
+
+    private void showTheNewImage(BufferedImage image) {
+
+        theMainPanel.removeAll();
+
+        theMainPanel.add(new JLabel(new ImageIcon(image)), BorderLayout.CENTER);
+
+        theMainPanel.updateUI();
 
     }
 
