@@ -1,3 +1,23 @@
+Digital Image Processing
+=========================
+
+The basic of digital image processing in JAVA
+
+## Gray Scale
+
+Before
+
+<img src="screenshots/original.PNG" />
+
+After
+
+<img src="screenshots/after.PNG" />
+
+
+The Real Deal Function
+
+```java
+
 package org.example.utils;
 
 import java.awt.*;
@@ -28,3 +48,5 @@ public class ImageHelper {
     }
 
 }
+
+```

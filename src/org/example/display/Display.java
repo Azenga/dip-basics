@@ -16,13 +16,13 @@ import java.util.concurrent.ExecutionException;
 public class Display {
 
     private JFrame frame;
-    private String title;
-    private int width;
-    private int height;
+    private final String title;
+    private final int width;
+    private final int height;
     private JPanel theMainPanel;
     private JMenuBar theMenuBar;
 
-    private BufferedImage originalImage, newImage;
+    private BufferedImage newImage;
     private String extension;
     private String fileName;
 
@@ -76,7 +76,7 @@ public class Display {
                 if (result == JFileChooser.APPROVE_OPTION) {
                     String dirname = directoryChooser.getSelectedFile().getAbsolutePath();
 
-                    SwingWorker<Void, Void> fileWriterWorker = new SwingWorker<Void, Void>() {
+                    SwingWorker<Void, Void> fileWriterWorker = new SwingWorker<>() {
                         @Override
                         protected Void doInBackground() throws Exception {
 
@@ -148,7 +148,6 @@ public class Display {
         try {
             BufferedImage image = ImageIO.read(file);
 
-            originalImage = image;
             extension = FileHelper.getFileExtension(file);
             fileName = file.getName();
 
