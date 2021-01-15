@@ -1,8 +1,14 @@
 package org.example;
 
+import org.example.display.Display;
+
 public class App {
 
     public static void main(String[] args) {
-        System.out.println("Digital Image Processing");
+
+        Display display = new Display("Digital Image Processing", 600, 400);
+
+        display.show();
+
     }
 }
