@@ -1,5 +1,6 @@
 package org.example.display;
 
+import org.example.utils.FileHelper;
 import org.example.utils.ImageHelper;
 
 import javax.imageio.ImageIO;
@@ -19,6 +20,11 @@ public class Display {
     private int width;
     private int height;
     private JPanel theMainPanel;
+    private JMenuBar theMenuBar;
+
+    private BufferedImage originalImage, newImage;
+    private String extension;
+    private String fileName;
 
     public Display(String title, int width, int height) {
         this.title = title;
@@ -34,6 +40,10 @@ public class Display {
         frame.setSize(width, height);
         frame.setLayout(new BorderLayout());
 
+        //Setup the Menu Bar
+        setUpTheMenuBar();
+        frame.setJMenuBar(theMenuBar);
+
         //Create and add the panel
         theMainPanel = new JPanel(new BorderLayout());
 
@@ -45,6 +55,63 @@ public class Display {
         frame.setLocationRelativeTo(null);
     }
 
+    private void setUpTheMenuBar() {
+        theMenuBar = new JMenuBar();
+
+        //File Menu
+        JMenu fileMenu = new JMenu("File");
+
+        JMenuItem saveMenuItem = new JMenuItem("Save");
+        saveMenuItem.addActionListener(e -> {
+
+            if (newImage != null) {
+
+                JFileChooser directoryChooser = new JFileChooser(System.getProperty("user.home"));
+                directoryChooser.setDialogTitle("Select the directory location");
+                directoryChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                directoryChooser.setAcceptAllFileFilterUsed(false);
+
+                int result = directoryChooser.showOpenDialog(frame);
+
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    String dirname = directoryChooser.getSelectedFile().getAbsolutePath();
+
+                    SwingWorker<Void, Void> fileWriterWorker = new SwingWorker<Void, Void>() {
+                        @Override
+                        protected Void doInBackground() throws Exception {
+
+                            File file = new File(dirname + '\\' + fileName);
+
+                            ImageIO.write(newImage, extension, file);
+
+                            return null;
+                        }
+
+                        @Override
+                        protected void done() {
+                            super.done();
+                            JOptionPane.showMessageDialog(frame, "Image Saved", "Saving Image", JOptionPane.INFORMATION_MESSAGE);
+
+                        }
+                    };
+
+                    fileWriterWorker.execute();
+                }
+
+            }
+
+        });
+        fileMenu.add(saveMenuItem);
+
+        JMenuItem exitMenuItem = new JMenuItem("Exit");
+        exitMenuItem.addActionListener(e -> System.exit(0));
+        fileMenu.add(exitMenuItem);
+
+
+        theMenuBar.add(fileMenu);
+
+    }
+
     private void setUpTheSelectImageButton() {
 
         JButton selectImageButton = new JButton("Select Image");
@@ -54,14 +121,17 @@ public class Display {
 
             FileNameExtensionFilter extensionFilter = new FileNameExtensionFilter("image/*", "jpg", "png", "jpeg", "bmp");
 
+            fileChooser.setAcceptAllFileFilterUsed(false);
             fileChooser.addChoosableFileFilter(extensionFilter);
 
             int result = fileChooser.showOpenDialog(frame);
 
             if (result == JFileChooser.APPROVE_OPTION) {
+
                 File selectedFile = fileChooser.getSelectedFile();
 
                 showSelectedImage(selectedFile);
+
             }
 
         });
@@ -77,6 +147,10 @@ public class Display {
     private void showSelectedImage(File file) {
         try {
             BufferedImage image = ImageIO.read(file);
+
+            originalImage = image;
+            extension = FileHelper.getFileExtension(file);
+            fileName = file.getName();
 
             theMainPanel.removeAll();
 
@@ -124,6 +198,7 @@ public class Display {
     }
 
     private void showTheNewImage(BufferedImage image) {
+        newImage = image;
 
         theMainPanel.removeAll();
 
